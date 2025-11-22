@@ -5,7 +5,7 @@ import java.util.Scanner;
 import member.MemberDTO;
 import member.MemberController;
 import asset.AssetController;
-// import trade.TradeController;
+import trade.TradeController;
 // import quiz.QuizController;
 
 public class MainController {
@@ -34,9 +34,7 @@ public class MainController {
             switch (job) {
                 case 1 -> controller = new MemberController();
                 case 2 -> controller = new AssetController();
-                case 3 -> {
-                    // controller = new TradeController();
-                }
+                case 3 -> controller = new TradeController();
                 case 4 -> {
                     // controller = new QuizController();
                 }

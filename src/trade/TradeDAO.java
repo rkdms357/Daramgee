@@ -1,0 +1,87 @@
+package trade;
+
+import java.sql.*;
+import util.DBUtil;
+import main.MainController;
+
+public class TradeDAO {
+    // 1. 매수 기능
+    public int buy(String userId, String assetId, int quantity, int price, int totalCost) {
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        int result = 0;
+        try {
+            conn = DBUtil.dbconnect();
+            conn.setAutoCommit(false); //커밋하기전까지 DB반영안함
+            // 1. 돈 빼기
+            String sql = "update users set cash = cash - ? where user_id = ?";
+            st = conn.prepareStatement(sql);
+            st.setInt(1, totalCost);
+            st.setString(2, userId);
+            int r1 = st.executeUpdate();
+
+            // 2. 지갑에 넣기
+            // 이미 있는지 확인
+            String checkSql = "select quantity, avg_price from portfolio where user_id = ? and asset_id = ?";
+            st = conn.prepareStatement(checkSql);
+            st.setString(1, userId);
+            st.setString(2, assetId);
+            rs = st.executeQuery();
+
+            if (rs.next()) {
+                // 2-1. 전에 구매했으면 -> 수량 늘리고 평단가 수정 (Update)
+                int oldQty = rs.getInt("quantity");
+                double oldAvg = rs.getDouble("avg_price");
+                // 새 평단가 = ((기존수량*기존평단) + (새수량*새가격)) / 총수량
+                double newAvg = ((oldQty * oldAvg) + (quantity * price)) / (oldQty + quantity);
+
+                String updateSql = "update portfolio set quantity = quantity + ?, avg_price = ? where user_id = ? and asset_id = ?";
+                st = conn.prepareStatement(updateSql);
+                st.setInt(1, quantity);
+                st.setDouble(2, newAvg);
+                st.setString(3, userId);
+                st.setString(4, assetId);
+                st.executeUpdate();
+            } else {
+                // 2-2. 전에 구매 안했으면 -> 새로 만들기 (Insert) - ID는 max+1 방식 사용
+                String insertSql = "insert into portfolio (portfolio_id, quantity, avg_price, user_id, asset_id) " +
+                        "values ((select nvl(max(portfolio_id),0)+1 from portfolio), ?, ?, ?, ?)";
+                st = conn.prepareStatement(insertSql);
+                st.setInt(1, quantity);
+                st.setInt(2, price);
+                st.setString(3, userId);
+                st.setString(4, assetId);
+                st.executeUpdate();
+            }
+
+            // 3. 거래 기록 남기기
+            String logSql = "insert into trade_log (trade_log_id, trade_type, trade_quantity, trade_price, trade_date, user_id, asset_id) " +
+                    "values ((select nvl(max(trade_log_id),0)+1 from trade_log), 'BUY', ?, ?, sysdate, ?, ?)";
+            st = conn.prepareStatement(logSql);
+            st.setInt(1, quantity);
+            st.setInt(2, price);
+            st.setString(3, userId);
+            st.setString(4, assetId);
+            int r3 = st.executeUpdate();
+
+            if (r1 > 0 && r3 > 0) {
+                conn.commit();
+                result = 1;
+                MainController.loginUser.setCash(MainController.loginUser.getCash() - totalCost);
+            } else {
+                conn.rollback();
+            }
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            } // 에러나면 롤백
+            e.printStackTrace();
+        } finally {
+            DBUtil.dbDisconnect(conn, st, rs);
+        }
+        return result;
+    }
+}
