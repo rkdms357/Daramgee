@@ -42,7 +42,7 @@ public class MemberController implements ControllerInterface {
         System.out.println("===============회원가입================");
         String userId = null;
         while(true) {
-            System.out.print("아이디 입력 (99.메인으로)>> ");
+            System.out.print("아이디 입력 (99. 이전으로)>> ");
             userId = sc.next();
 
             if(userId.equals("99")) return;
@@ -72,14 +72,14 @@ public class MemberController implements ControllerInterface {
 
     // 2. 로그인
     private void f_login() {
-        System.out.println("===============로그인-================");
+        System.out.println("================로그인=================");
         String userId = null;
         MemberDTO member = null;
         while(true) {
-            System.out.print("아이디 입력 (99.메인으로)>> ");
+            System.out.print("아이디 입력 (99. 이전으로)>> ");
             userId = sc.next();
 
-            if(userId.equals("99")) return; //메인으로
+            if(userId.equals("99")) return;
 
             member = memberService.selectById(userId);
             if (member != null) break;
@@ -87,10 +87,10 @@ public class MemberController implements ControllerInterface {
         }
 
         while(true) {
-            System.out.print("비밀번호 입력 (99.메인으로)>> ");
+            System.out.print("비밀번호 입력 (99. 이전으로)>> ");
             String password = sc.next();
 
-            if(password.equals("99")) return; //메인으로
+            if(password.equals("99")) return;
             if(password.equals(member.getPassword())) {
                 break;
             }
@@ -110,7 +110,7 @@ public class MemberController implements ControllerInterface {
 
     // 4. 회원 탈퇴
     private void f_delete() {
-        System.out.println("===============회원탈퇴===============");
+        System.out.println("===============회원탈퇴================");
         String userId = MainController.loginUser.getUserId();
 
         // (로그인이 풀렸거나 할 때)
@@ -124,6 +124,7 @@ public class MemberController implements ControllerInterface {
         String password = sc.next();
         if (!password.equals(member.getPassword())) {
             MemberView.print("비밀번호가 틀렸습니다.");
+            MemberView.print("탈퇴를 취소합니다...");
             return;
         }
 

@@ -39,7 +39,7 @@ public class TradeController implements ControllerInterface {
         String symbol = null;
         int currentPrice = 0;
         while (true) {
-            System.out.print("매수(구매)할 코인 약어 입력 (99.메인으로)>> ");
+            System.out.print("매수(구매)할 코인 약어 입력 (99. 이전으로)>> ");
             symbol = sc.next();
             if(symbol.equals("99")) {
                 TradeView.print("매수를 취소합니다.");
@@ -87,7 +87,7 @@ public class TradeController implements ControllerInterface {
         String symbol = null;
         int myQuantity = 0;
         while (true) {
-            System.out.print("매도(판매)할 코인 약어 입력 (99.메인으로)>> ");
+            System.out.print("매도(판매)할 코인 약어 입력 (99. 이전으로)>> ");
             symbol = sc.next();
             if(symbol.equals("99")) {
                 TradeView.print("매도를 취소합니다.");

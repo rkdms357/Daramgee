@@ -6,7 +6,7 @@ import main.MainController;
 public class PortfolioView {
 
     public static void printPortfolio(List<PortfolioDTO> list) {
-        System.out.println("=============내 보유 자산 현황=============");
+        System.out.println("============내 보유 자산 현황============");
 
         if (list == null || list.isEmpty()) {
             System.out.println("보유 중인 코인이 없습니다. 거래소에서 매수해보세요");
@@ -15,7 +15,7 @@ public class PortfolioView {
         }
 
         System.out.println("--------------------------------------------------------------------------------");
-        System.out.printf("%-8s | %-6s | %10s | %10s | %10s | %8s\n",
+        System.out.printf("%8s | %6s | %10s | %10s | %10s | %8s\n",
                 "코인명", "수량", "평단가", "현재가", "평가손익", "수익률");
         System.out.println("--------------------------------------------------------------------------------");
 
@@ -23,7 +23,7 @@ public class PortfolioView {
         int totalCoinValue = 0;
 
         for (PortfolioDTO p : list) {
-            System.out.printf("%-8s | %-6d | %,10d | %,10d | %,10d | %8f%%\n",
+            System.out.printf("%8s | %6d | %,10d | %,10d | %,11d | %12f%%\n",
                     p.getName(),
                     p.getQuantity(),
                     p.getAvgPrice(),
