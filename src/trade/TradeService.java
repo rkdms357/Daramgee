@@ -14,7 +14,7 @@ public class TradeService {
 
         // 2. 현재 가격 조회 (빗썸 API)
         int currentPrice = coinService.getPrice(assetId);
-        if (currentPrice == 0) return "시세 조회를 실패했습니다. (종목명 확인 필요)";
+        if (currentPrice == 0) return "시세 조회를 실패했습니다.";
 
         // 3. 총비용 계산
         int totalCost = currentPrice * count;
@@ -40,7 +40,7 @@ public class TradeService {
 
         // 2. 현재 가격 조회 (빗썸 API)
         int currentPrice = coinService.getPrice(assetId);
-        if (currentPrice == 0) return "시세 조회를 실패했습니다. (종목명 확인 필요)";
+        if (currentPrice == 0) return "시세 조회를 실패했습니다.";
 
         // 3. 총 판매가격 계산
         int totalCost = currentPrice * count;
@@ -59,5 +59,9 @@ public class TradeService {
         } else {
             return "매도를 실패했습니다.(시스템 오류)";
         }
+    }
+
+    public int getQuantity(String userId, String assetId) {
+        return tradeDAO.getQuantity(userId, assetId);
     }
 }
