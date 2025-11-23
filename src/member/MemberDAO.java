@@ -63,16 +63,36 @@ public class MemberDAO {
         String msg = null;
         Connection conn = null;
         PreparedStatement st = null;
-        String sql = "delete from users where user_id = ?";
         try {
             conn = DBUtil.dbconnect();
-            st = conn.prepareStatement(sql);
+            conn.setAutoCommit(false); //트랜잭션 시작
+
+            // 자식 데이터 삭제
+            String sql1 = "delete from trade_log where user_id = ?";
+            st = conn.prepareStatement(sql1);
+            st.setString(1, userId);
+            st.executeUpdate();
+            st.close();
+
+            // 자식 데이터 삭제 (보유 코인)
+            String sql2 = "delete from portfolio where user_id = ?";
+            st = conn.prepareStatement(sql2);
+            st.setString(1, userId);
+            st.executeUpdate();
+            st.close();
+
+            // 부모(회원) 삭제
+            String sql3 = "delete from users where user_id = ?";
+            st = conn.prepareStatement(sql3);
             st.setString(1, userId);
             int result = st.executeUpdate();
-            if (result > 0) {
-                msg = "탈퇴가 완료되었습니다.";
+
+            if(result > 0) {
+                conn.commit(); // 모든 삭제 확정
+                msg = "탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다. 🐿️";
             } else {
-                msg = "탈퇴가 실패하였습니다."; // DB반영 안됨
+                conn.rollback(); // 실패하면 되돌리기
+                msg = "삭제할 회원 정보가 없습니다.";
             }
         } catch (SQLException e) {
             e.printStackTrace();
