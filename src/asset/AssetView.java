@@ -9,9 +9,6 @@ public class AssetView {
 
     public static void menu() {
         System.out.println("------------[🐿️종목시세조회]------------");
-        System.out.println("1.종목시세조회  99.메인으로");
-        System.out.println("-------------------------------------");
-        System.out.print("메뉴 선택>> ");
     }
 
     public static void printAssetList(List<AssetDTO> list) {

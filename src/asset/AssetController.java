@@ -5,22 +5,12 @@ import java.util.Scanner;
 import main.ControllerInterface;
 
 public class AssetController implements ControllerInterface {
-    Scanner sc;
     AssetService assetService = new AssetService();
 
     @Override
     public void execute(Scanner sc) {
-        this.sc = sc;
-        boolean isStop = false;
-        while (!isStop) {
-            AssetView.menu();
-            int job = sc.nextInt();
-            switch (job) {
-                case 1 -> printAllAssets();
-                case 99 -> isStop = true;
-                default -> AssetView.print("잘못된 선택입니다.");
-            }
-        }
+        AssetView.menu();
+        printAllAssets();
     }
 
     private void printAllAssets() {
