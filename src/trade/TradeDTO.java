@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class TradeDTO {
 
-    private int tradeLogId;
+    private int tradeId;
     private String tradeType;
     private int tradeQuantity;
     private int tradePrice;

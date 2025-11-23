@@ -25,14 +25,16 @@ public class TradeController implements ControllerInterface {
             switch (job) {
                 case 1 -> f_buy();
                 case 2 -> f_sell();
+                case 3 -> f_history();
                 case 99 -> isStop = true;
                 default -> TradeView.print("잘못된 선택입니다.");
             }
         }
     }
+
     // 1. 매수하기
     private void f_buy() {
-        System.out.println("===========매수(구매)하기===========");
+        System.out.println("===============매수(구매)하기===============");
         System.out.println("내 잔고: " + MainController.loginUser.getCash() + "원");
         coinPricePrint();
 
@@ -70,7 +72,7 @@ public class TradeController implements ControllerInterface {
     }
     // 2. 매도하기
     private void f_sell() {
-        System.out.println("===========매도(판매)하기===========");
+        System.out.println("===============매도(판매)하기===============");
 
         String userId = MainController.loginUser.getUserId();
         List<PortfolioDTO> myList = portfolioService.getMyPortfolio(userId);
@@ -126,5 +128,35 @@ public class TradeController implements ControllerInterface {
         AssetView.print("빗썸에서 실시간 시세를 가져오는 중입니다...🐿️");
         List<AssetDTO> list = assetService.getAllAssets();
         AssetView.printAssetList(list);
+    }
+
+    // 매수/매도 기록 보기
+    private void f_history() {
+        System.out.println("=============거래 내역 조회=============");
+        String userId = MainController.loginUser.getUserId();
+        List<TradeDTO> list = tradeService.getTradeHistory(userId);
+
+        if(list.isEmpty()) {
+            System.out.println("아직 거래 기록이 없습니다. 매수를 먼저 진행해 주세요.");
+            return;
+        }
+
+        System.out.println("-----------------------------------------------------------");
+        System.out.printf("%-12s %-6s %-10s %9s %12s\n", "날짜", "구분", "코인", "수량", "단가");
+        System.out.println("-----------------------------------------------------------");
+
+        for (TradeDTO t : list) {
+            String coinName = t.getAssetId().replace("KRW-", "");
+            String type = t.getTradeType().trim().equals("BUY") ? "🔴매수" : "🔵매도";
+            System.out.printf("%s  %-6s %-10s %,10d개 %,12d원\n",
+                    t.getTradeDate(),      // 날짜
+                    type,                  // 매수/매도
+                    coinName,              // BTC
+                    t.getTradeQuantity(),  // 수량
+                    t.getTradePrice()      // 가격
+            );
+        }
+        System.out.println("=====================================");
+        System.out.println("-----------------------------------------------------------");
     }
 }

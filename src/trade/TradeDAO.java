@@ -1,8 +1,9 @@
 package trade;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import lombok.NonNull;
 import util.DBUtil;
 import main.MainController;
 
@@ -58,8 +59,8 @@ public class TradeDAO {
             }
 
             // 3. 거래 기록 남기기
-            String logSql = "insert into trade_log (trade_log_id, trade_type, trade_quantity, trade_price, trade_date, user_id, asset_id) " +
-                    "values ((select nvl(max(trade_log_id),0)+1 from trade_log), 'BUY', ?, ?, sysdate, ?, ?)";
+            String logSql = "insert into trade (trade_id, trade_type, trade_quantity, trade_price, trade_date, user_id, asset_id) " +
+                    "values ((select nvl(max(trade_id),0)+1 from trade), 'BUY', ?, ?, sysdate, ?, ?)";
             st = conn.prepareStatement(logSql);
             st.setInt(1, quantity);
             st.setInt(2, price);
@@ -130,8 +131,8 @@ public class TradeDAO {
                 }
             }
             // 3. 거래 기록 남기기
-            String logSql = "insert into trade_log (trade_log_id, trade_type, trade_quantity, trade_price, trade_date, user_id, asset_id) " +
-                    "values ((select nvl(max(trade_log_id),0)+1 from trade_log), 'SELL', ?, ?, sysdate, ?, ?)";
+            String logSql = "insert into trade (trade_id, trade_type, trade_quantity, trade_price, trade_date, user_id, asset_id) " +
+                    "values ((select nvl(max(trade_id),0)+1 from trade), 'SELL', ?, ?, sysdate, ?, ?)";
             st = conn.prepareStatement(logSql);
             st.setInt(1, quantity);
             st.setInt(2, price);
@@ -176,5 +177,35 @@ public class TradeDAO {
             DBUtil.dbDisconnect(conn, st, rs);
         }
         return result;
+    }
+
+    // 4. 거래 내역 전체 조회
+    public List<TradeDTO> selectAll(String userId) {
+        List<TradeDTO> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        String sql = "select * from trade where user_id = ? order by trade_date desc";
+        try {
+            conn = DBUtil.dbconnect();
+            st = conn.prepareStatement(sql);
+            st.setString(1, userId);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                TradeDTO t = new TradeDTO();
+                t.setTradeId(rs.getInt("trade_id"));
+                t.setTradeType(rs.getString("trade_type")); // BUY, SELL
+                t.setAssetId(rs.getString("asset_id"));     // KRW-BTC
+                t.setTradeQuantity(rs.getInt("trade_quantity"));
+                t.setTradePrice(rs.getInt("trade_price"));
+                t.setTradeDate(rs.getDate("trade_date"));
+                list.add(t);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtil.dbDisconnect(conn, st, rs);
+        }
+        return list;
     }
 }

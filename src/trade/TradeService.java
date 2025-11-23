@@ -3,6 +3,8 @@ package trade;
 import service.CoinService;
 import main.MainController;
 
+import java.util.List;
+
 public class TradeService {
     TradeDAO tradeDAO = new TradeDAO();
     CoinService coinService = new CoinService();
@@ -63,5 +65,9 @@ public class TradeService {
 
     public int getQuantity(String userId, String assetId) {
         return tradeDAO.getQuantity(userId, assetId);
+    }
+
+    public List<TradeDTO> getTradeHistory(String userId) {
+        return tradeDAO.selectAll(userId);
     }
 }

@@ -68,7 +68,7 @@ public class MemberDAO {
             conn.setAutoCommit(false); //트랜잭션 시작
 
             // 자식 데이터 삭제
-            String sql1 = "delete from trade_log where user_id = ?";
+            String sql1 = "delete from trade where user_id = ?";
             st = conn.prepareStatement(sql1);
             st.setString(1, userId);
             st.executeUpdate();
